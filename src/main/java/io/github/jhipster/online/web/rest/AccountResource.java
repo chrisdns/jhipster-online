@@ -8,6 +8,7 @@ import io.github.jhipster.online.security.SecurityUtils;
 import io.github.jhipster.online.service.MailService;
 import io.github.jhipster.online.service.UserService;
 import io.github.jhipster.online.service.dto.UserDTO;
+import io.github.jhipster.online.service.util.ProfileUtil;
 import io.github.jhipster.online.web.rest.errors.*;
 import io.github.jhipster.online.web.rest.vm.KeyAndPasswordVM;
 import io.github.jhipster.online.web.rest.vm.ManagedUserVM;
@@ -15,6 +16,8 @@ import io.github.jhipster.online.web.rest.vm.ManagedUserVM;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,11 +41,14 @@ public class AccountResource {
 
     private final MailService mailService;
 
-    public AccountResource(UserRepository userRepository, UserService userService, MailService mailService) {
+    private final Environment environment;
+
+    public AccountResource(UserRepository userRepository, UserService userService, MailService mailService, Environment environment) {
 
         this.userRepository = userRepository;
         this.userService = userService;
         this.mailService = mailService;
+        this.environment = environment;
     }
 
     /**
@@ -63,7 +69,9 @@ public class AccountResource {
         userRepository.findOneByLogin(managedUserVM.getLogin().toLowerCase()).ifPresent(u -> {throw new LoginAlreadyUsedException();});
         userRepository.findOneByEmailIgnoreCase(managedUserVM.getEmail()).ifPresent(u -> {throw new EmailAlreadyUsedException();});
         User user = userService.registerUser(managedUserVM, managedUserVM.getPassword());
-        mailService.sendActivationEmail(user);
+        if (ProfileUtil.areEmailsEnabled(environment)) {
+            mailService.sendActivationEmail(user);
+        }
     }
 
     /**

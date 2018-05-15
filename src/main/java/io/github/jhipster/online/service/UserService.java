@@ -8,6 +8,7 @@ import io.github.jhipster.online.config.Constants;
 import io.github.jhipster.online.repository.UserRepository;
 import io.github.jhipster.online.security.AuthoritiesConstants;
 import io.github.jhipster.online.security.SecurityUtils;
+import io.github.jhipster.online.service.util.ProfileUtil;
 import io.github.jhipster.online.service.util.RandomUtil;
 import io.github.jhipster.online.service.dto.UserDTO;
 
@@ -15,6 +16,7 @@ import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.CacheManager;
+import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -49,12 +51,22 @@ public class UserService {
 
     private final CacheManager cacheManager;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthorityRepository authorityRepository, GithubService githubService, CacheManager cacheManager) {
+    private final Environment environment;
+
+    public UserService(
+        UserRepository userRepository,
+        PasswordEncoder passwordEncoder,
+        AuthorityRepository authorityRepository,
+        GithubService githubService,
+        CacheManager cacheManager,
+        Environment environment
+    ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authorityRepository = authorityRepository;
         this.githubService = githubService;
         this.cacheManager = cacheManager;
+        this.environment = environment;
     }
 
     public Optional<User> activateRegistration(String key) {
@@ -107,8 +119,16 @@ public class UserService {
         newUser.setEmail(userDTO.getEmail());
         newUser.setImageUrl(userDTO.getImageUrl());
         newUser.setLangKey(userDTO.getLangKey());
-        // new user is not active
-        newUser.setActivated(false);
+
+        if (ProfileUtil.areEmailsEnabled(environment)) {
+            // new user is not active
+            newUser.setActivated(false);
+        } else {
+            log.debug("NOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO MAIIIIIIIIIIIIIIIL");
+            // new user is active
+            newUser.setActivated(true);
+        }
+
         // new user gets registration key
         newUser.setActivationKey(RandomUtil.generateActivationKey());
         Set<Authority> authorities = new HashSet<>();

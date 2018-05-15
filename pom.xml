@@ -682,6 +682,9 @@
             </properties>
         </profile>
         <profile>
+            <id>nomail</id>
+        </profile>
+        <profile>
             <id>webpack</id>
             <build>
                 <plugins>
