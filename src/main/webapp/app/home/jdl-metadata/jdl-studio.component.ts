@@ -182,10 +182,9 @@ export class ApplyJdlStudioComponent implements OnInit, OnDestroy {
         const modalRef = this.modalService.open(JdlOutputDialogComponent, { size: 'lg', backdrop: 'static' }).componentInstance;
 
         modalRef.applyJdlId = applyJdlId;
-        // FIXME
-        modalRef.gitHubOrganization = this.selectedGitCompany;
-        // FIXME
-        modalRef.gitHubProject = this.gitProject;
+        modalRef.selectedGitCompany = this.selectedGitCompany;
+        modalRef.selectedGitProject = this.gitProject;
+        modalRef.selectedGitProvider = this.selectedGitProvider;
     }
 
     ngOnDestroy() {

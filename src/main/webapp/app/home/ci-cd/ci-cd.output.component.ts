@@ -31,8 +31,6 @@ export class CiCdOutputDialogComponent implements OnInit {
 
     ciCdTool: string;
 
-    gitHubOrganization: string;
-
     gitProject: string;
 
     displayApplicationUrl = false;

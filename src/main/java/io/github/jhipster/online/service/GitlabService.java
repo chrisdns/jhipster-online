@@ -28,6 +28,7 @@ import io.github.jhipster.online.security.SecurityUtils;
 import io.github.jhipster.online.service.interfaces.GitProviderService;
 import org.gitlab.api.GitlabAPI;
 import org.gitlab.api.TokenType;
+import org.gitlab.api.models.GitlabGroup;
 import org.gitlab.api.models.GitlabProject;
 import org.gitlab.api.models.GitlabUser;
 import org.kohsuke.github.GHCreateRepositoryBuilder;
@@ -108,6 +109,8 @@ public class GitlabService implements GitProviderService {
             groups.add(myGroup);
         }
 
+        List<GitlabGroup> gitlabGroups = gitlab.getGroups();
+
         // Sync the projects from the user's groups
         gitlab.getGroups().forEach(group -> {
             GitCompany company = new GitCompany();
@@ -127,6 +130,15 @@ public class GitlabService implements GitProviderService {
                 log.error("Could not sync GitHub repositories for user `{}`: {}", user.getLogin(), e.getMessage());
             }
         });
+        // Remove groups that are not available anymore
+        List<GitCompany> toRemove = groups.stream()
+            .filter(g -> !g.getName().equals(user.getGitlabUser()) &&
+                    gitlabGroups.stream()
+                        .noneMatch(glg -> glg.getName().equals(g.getName())))
+            .collect(Collectors.toList());
+
+        groups.removeAll(toRemove);
+        gitCompanyRepository.deleteAll(toRemove);
 
         user.setGitCompanies(groups);
         return user;

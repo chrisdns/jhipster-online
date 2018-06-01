@@ -29,9 +29,11 @@ export class JdlOutputDialogComponent implements OnInit {
 
     applyJdlId: string;
 
-    gitHubOrganization: string;
+    selectedGitCompany: string;
 
-    gitHubProject: string;
+    selectedGitProject: string;
+
+    selectedGitProvider: string;
 
     displayBranchUrl = false;
 

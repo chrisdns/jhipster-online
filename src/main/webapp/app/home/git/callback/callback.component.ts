@@ -43,7 +43,7 @@ export class CallbackComponent implements OnInit {
             this.token = params['token'];
             this.isLoading = true;
             const capitalizedProvider = this.provider.charAt(0).toUpperCase() + this.provider.slice(1);
-            this.message = `JHipster is trying to link your ${capitalizedProvider} repositories...`;
+            this.message = `JHipster is trying to link your ${capitalizedProvider} repositories...\n This action may take some time.`;
             this.callbackService.saveToken(this.provider, this.token).subscribe(
                 () => {
                     this.message = `JHipster is successfully linked to your ${capitalizedProvider} repositories.`;
